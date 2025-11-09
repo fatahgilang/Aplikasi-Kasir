@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Models\Product;
 use App\Models\Customer;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
@@ -10,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 
 class OrderForm
@@ -51,11 +53,24 @@ class OrderForm
                     Repeater::make('orderDetails')
                     ->relationship()
                     ->schema([
-                        Select::make('product.name'),
+                        Select::make('product_id')
+                        ->relationship('product', 'name')
+                        ->reactive()
+                        ->afterStateUpdated(function($state, Set $set, Get $get){
+                            $product=Product::find($state);
+                            $price=$product->price ?? 0;
+                            $set('price', $price);
+                            $qty=$get('qty') ?? 1;
+                            $set ('qty', $qty);
+                            $subtotal=$price*$qty;
+                            $set ('subtotal', $subtotal);
+
+                        }),
+                        TextInput::make('price'),
                         TextInput::make('qty'),
                         TextInput::make('subtotal'),
                         
-                    ])->columns(3),
+                    ])->columns(4),
                 ])
                     ->columnSpanFull(),
 
