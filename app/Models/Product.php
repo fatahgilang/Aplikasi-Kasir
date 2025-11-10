@@ -12,6 +12,7 @@ class Product extends Model
         'name',
         'price',
         'stock',
+        'image',
     ];
 
     // relasi table product dengan  table order_details
