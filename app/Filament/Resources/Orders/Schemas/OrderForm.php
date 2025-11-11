@@ -86,6 +86,11 @@ class OrderForm
                             $items = $parent['orderDetails'] ?? [];
                             $total = collect($items)->sum(fn($item) => $item['subtotal'] ?? 0);
                             $set('../../total_price', $total);
+
+                            $discount = $get('../../discount');
+                            $discount_amount = $total * $discount / 100;
+                            $set ('../../discount_amount',$discount_amount);
+                            $set ('../../total_payment', $total - $discount_amount);
                         }),
                         TextInput::make('price')
                         ->readOnly()
@@ -104,6 +109,11 @@ class OrderForm
                             $items = $parent['orderDetails'] ?? [];
                             $total = collect($items)->sum(fn($item) => $item['subtotal'] ?? 0);
                             $set('../../total_price', $total);
+
+                            $discount = $get('../../discount');
+                            $discount_amount = $total * $discount / 100;
+                            $set ('../../discount_amount',$discount_amount);
+                            $set ('../../total_payment', $total - $discount_amount);
                         }),
                         TextInput::make('subtotal')
                         ->numeric()
@@ -113,15 +123,47 @@ class OrderForm
                     ])->columns(4),
                     ])->columnSpanFull(),
                 ])->columnSpan(2),
+
                 Section::make()
                 ->description('Payment Information')
                 ->schema([
+                    Select::make('status')
+                    ->options([
+                        'new' => 'New',
+                        'processing' => 'Processing',
+                        'cancelled' => 'Cancelled',
+                        'completed' => 'Completed',
+                    ])->default('new')
+                    ->columnSpanFull(),
                     TextInput::make('total_price')
+                    ->required()
                     ->numeric()
-                    ->default(0)
+                    ->dehydrated()
                     ->readOnly()
-                    ->helperText('Total price is automatically calculated'),
-                ]),
+                    ->dehydrated()
+                    ->columnSpanFull(),
+                    TextInput::make('discount')
+                    ->columnSpan(1)
+                    ->reactive()
+                    ->afterStateUpdated(function($state, Set $set, Get $get){
+                        $discount=floatval($state)?? 0;
+                        $total_price=$get('total_price')?? 0;
+                        $discount_amount= $total_price * $discount / 100;
+                        $set ('discount_amount',$discount_amount);
+                        $set ('total_payment',$total_price - $discount_amount);
+
+                    }),
+                    TextInput::make('discount_amount')
+                    ->columnSpan(3)
+                    ->disabled()
+                    ->dehydrated(),
+                    TextInput::make('total_payment')
+                    ->columnSpanFull()
+                    ->disabled()
+                    ->dehydrated(),
+                ])->columnSpan(1)
+                ->columns(4),
+
             ])->columns(3);
     }
 }

@@ -1,27 +1,30 @@
 <?php
 
-namespace App\Filament\Resources\users\Schemas;
+namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Hash;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 
-class userForm
+class UserForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 TextInput::make('name')
-                ->required(),
+                    ->required(),
                 TextInput::make('email')
-                ->required(),
+                    ->label('Email address')
+                    ->email()
+                    ->required(),
+                DatePicker::make('email_verified_at'),
                 TextInput::make('password')
-                ->required()
-                ->password() //  enkripsi password
-                ->dehydrateStateUsing(fn (string $state): string => Hash::make($state))
-                ->dehydrated(fn (?string $state): bool => filled($state))
-                ->required(fn (string $operation): bool => $operation === 'create')
+                    ->password()
+                    ->required(),
+                
             ]);
     }
 }

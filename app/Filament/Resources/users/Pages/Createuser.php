@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\users\Pages;
+namespace App\Filament\Resources\Users\Pages;
 
-use App\Filament\Resources\users\UserResource;
+use App\Filament\Resources\Users\UserResource;
 use Filament\Resources\Pages\CreateRecord;
 
-class Createuser extends CreateRecord
+class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
 }

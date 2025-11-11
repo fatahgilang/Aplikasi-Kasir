@@ -18,6 +18,10 @@ class Order extends Model
         'customer_id',
         'date',
         'total_price',
+        'discount',
+        'discount_amount',
+        'total_payment',
+        'status',
     ];
 
     // relasi table product dengan  table order_details
